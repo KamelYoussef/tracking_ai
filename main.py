@@ -1,19 +1,48 @@
 from utils import *
+import streamlit as st
+import time
 
 
+# config data
 config = load_config("param.yml")
 
 cities = config["cities"]
 search_phrases = config["search_phrases"]
 
-texts = [chatgpt(f"{config['prompt']} {city}") for city in cities]
+#streamlit app
+st.title("AI Tracking - Chat gpt")
 
-save_list_to_txt("responses_chat_gpt.txt", texts)
-texts = read_list_from_txt("responses_chat_gpt.txt")
+st.sidebar.header("Summary")
+summary_data = []
 
-results = find_words_in_texts(texts, search_phrases)
+if st.button("Start"):
+    start_time = time.time()
+    with st.spinner('Wait for it...'):
+        # Generate responses
+        texts = [chatgpt(f"{config['prompt']} {city}").content for city in cities]
+        save_list_to_txt("responses_chat_gpt.txt", texts)
 
-for result in results:
-    print(f"Text: {result['text']}")
-    print(f"Matches: {', '.join(result['matches']) if result['matches'] else 'No matches found'}")
-    print("-" * 50)
+        # Find matches
+        results = find_words_in_texts(texts, search_phrases)
+
+        # Display results and build summary
+        for city, result in zip(cities, results):
+            st.write(f"Response for : {city}:/n {result['text']}")
+            matches = ', '.join(result['matches']) if result['matches'] else "No matches found"
+            st.write(f"Matches: {matches}")
+            st.write("-" * 50)
+
+            # Append summary data
+            summary_data.append({"City": city, "Matches Found": matches})
+
+        # Add summary to sidebar
+        if summary_data:
+            st.sidebar.table(summary_data)
+
+    elapsed_time = time.time() - start_time
+
+    st.success(f"Process completed in {elapsed_time:.2f} seconds.")
+    st.sidebar.metric("Elapsed Time (s)", f"{elapsed_time:.2f}")
+
+
+
