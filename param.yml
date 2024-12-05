@@ -1,0 +1,9 @@
+prompt : "give me the top insurance companies in"
+cities:
+  - calgary
+  - toronto
+  - vancouver
+search_phrases:
+  - western
+  - western financial group
+  - Western Financial Group Inc.
