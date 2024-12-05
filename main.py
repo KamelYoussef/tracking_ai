@@ -3,6 +3,7 @@ import streamlit as st
 import time
 from concurrent.futures import ThreadPoolExecutor
 import pandas as pd
+import numpy as np
 
 # Load and validate configuration with error handling
 def load_and_validate_config(config_path):
@@ -55,36 +56,28 @@ def display_results(cities, results):
 config = load_and_validate_config("param.yml")
 
 # Streamlit app UI
-st.title("AI Tracking - Chat GPT")
+st.title("Tracking Report")
 
-# Sidebar summary
-st.sidebar.header("Summary")
-summary_data = []
 
-# Start button for processing
-if st.button("Start"):
-    start_time = time.time()
-    with st.spinner('Processing... This might take some time.'):
+report = None
+# Sidebar
+st.sidebar.header("AI Tracking")
+with st.sidebar:
+    ai_tool = st.radio(
+        "Choose AI Tool",
+        ["CHAT_GPT", "PERPLEXITY", "GEMINI"],
+        index=None,
+    )
 
-        # Generate responses (no caching or progress bar)
-        texts = generate_responses(config['cities'], config['prompt'])
-        save_list_to_txt("responses_chat_gpt.txt", texts)
+    types = st.radio(
+        "Choose Insurance Product",
+        ["HOME", "HEALTH", "CARS"],
+        index=None,
+    )
 
-        # Find matches
-        results = process_responses(texts, config["search_phrases"])
+    if st.button("Generate Report"):
+        report = pd.DataFrame(
+            np.random.randn(10, 5), columns=("col %d" % i for i in range(5))
+        )
 
-        # Display results and build summary
-        summary_data = display_results(config["cities"], results)
-
-        # Add summary to sidebar
-        if summary_data:
-            df = pd.DataFrame(summary_data)
-            st.sidebar.dataframe(df, use_container_width=True)
-
-    elapsed_time = time.time() - start_time
-
-    st.success(f"Process completed in {elapsed_time:.2f} seconds.")
-    st.sidebar.metric("Elapsed Time (s)", f"{elapsed_time:.2f}")
-
-    # Provide downloadable file of the responses
-    st.sidebar.download_button("Download Responses", data="\n".join(texts), file_name="responses_chat_gpt.txt")
+st.table(report)
