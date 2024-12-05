@@ -27,7 +27,7 @@ if st.button("Start"):
 
         # Display results and build summary
         for city, result in zip(cities, results):
-            st.write(f"Response for : {city}:/n {result['text']}")
+            st.write(f"Response for : {city}:\n {result['text']}")
             matches = ', '.join(result['matches']) if result['matches'] else "No matches found"
             st.write(f"Matches: {matches}")
             st.write("-" * 50)
