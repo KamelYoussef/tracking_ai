@@ -1,5 +1,4 @@
 from utils import *
-import time
 from concurrent.futures import ThreadPoolExecutor
 import pandas as pd
 
@@ -93,7 +92,10 @@ def main():
 
     # Convert results to a DataFrame for better readability and storage
     df = pd.DataFrame(results)
-    print(df)
+
+    df = df[[col for col in df.columns if col != 'total_count'] + ['total_count']]
+
+    # Save to CSV file (optional)
     df.to_csv("results.csv", index=False)
 
 
